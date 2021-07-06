@@ -45,34 +45,34 @@ trian5 = Triangulation(model5)
 trian4 = Triangulation(model4)
 trian6 = Triangulation(model6)
 
-#writevtk(trian,"trian",celldata=["inoutcut"=>bgcell_to_inoutcut])
-#writevtk(trian5,"trian5")
-#writevtk(trian4,"trian4")
-#writevtk(trian6,"trian6")
+writevtk(trian,"trian",celldata=["inoutcut"=>bgcell_to_inoutcut])
+writevtk(trian5,"trian5")
+writevtk(trian4,"trian4")
+writevtk(trian6,"trian6")
 
 trian4cut = Triangulation(cutgeo,geo4,CUTIN)
-#writevtk(trian4cut,"trian4cut")
+writevtk(trian4cut,"trian4cut")
 
 trian4cutin = Triangulation(cutgeo,geo4,(CUTIN,IN))
-#writevtk(trian4cutin,"trian4cutin")
+writevtk(trian4cutin,"trian4cutin")
 
 trian6cutin = Triangulation(cutgeo,geo6,(CUTIN,IN))
-#writevtk(trian6cutin,"trian6cutin")
+writevtk(trian6cutin,"trian6cutin")
 
 trian7cutin = Triangulation(cutgeo,geo7,(CUTIN,IN))
-#writevtk(trian7cutin,"trian7cutin")
+writevtk(trian7cutin,"trian7cutin")
 
 trian8cutin = Triangulation(cutgeo,geo8,(CUTIN,IN))
-#writevtk(trian8cutin,"trian8cutin")
+writevtk(trian8cutin,"trian8cutin")
 
 trian5_Γ = EmbeddedBoundary(cutgeo,geo5)
-#writevtk(trian5_Γ,"trian5_G")
+writevtk(trian5_Γ,"trian5_G")
 
 trian8_Γ = EmbeddedBoundary(cutgeo,geo8)
-#writevtk(trian8_Γ,"trian8_G")
+writevtk(trian8_Γ,"trian8_G")
 
 trian82_Γ = EmbeddedBoundary(cutgeo,geo8,geo2)
-#writevtk(trian82_Γ,"trian82_G")
+writevtk(trian82_Γ,"trian82_G")
 
 #writevtk(cutdisc,"cutdisc")
 
@@ -92,8 +92,13 @@ cutgeo_facets = cut_facets(cutter,model,geo3)
 
 writevtk(cutgeo_facets.subfacets,"subfacets")
 
+
+
 trian = Triangulation(model)
 trian3 = Triangulation(cutgeo,geo3)
+
+btrian3in = BoundaryTriangulation(cutgeo_facets)
+
 btrian3in = BoundaryTriangulation(cutgeo_facets,"boundary",geo3,IN)
 btrian3 = BoundaryTriangulation(cutgeo_facets,"boundary",geo3,(CUTIN,IN))
 
@@ -106,4 +111,8 @@ btrian3 = BoundaryTriangulation(cutgeo_facets,"boundary",geo3,(CUTIN,IN))
 #  celldata=["bgcell"=>get_cell_to_bgcell(btrian3)],
 #  cellfields=["normal"=>get_normal_vector(btrian3)])
 
+#
+
+
 end # module
+

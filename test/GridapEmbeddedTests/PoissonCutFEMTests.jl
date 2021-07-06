@@ -11,35 +11,16 @@ f(x) = -Δ(u)(x)
 ud(x) = u(x)
 
 # Select geometry
-
-const R = 0.7
-geom = sphere(R)
+const R = 0.4
+geom = disk(R,x0=Point(0.75,0.5))
 n = 10
-partition = (n,n,n)
-
-##const R = 1.2
-##const r = 0.4
-##geom = doughnut(R,r)
-##n = 20
-##partition = (5*n,5*n,n)
-##
-##const R = 1.2
-##const r = 0.2
-##geom = olympic_rings(R,r)
-##n = 10
-##partition =(20*n,10*n,n)
-##
-##const R = 0.7
-##const L = 5.0
-##geom = tube(R,L,x0=Point(-0.5,0.0,-0.25))
-##n = 30
-##partition = (n,n,n)
+partition = (n,n)
 
 # Setup background model
-box = get_metadata(geom)
-bgmodel = CartesianDiscreteModel(box.pmin,box.pmax,partition)
-dp = box.pmax - box.pmin
-const h = dp[1]/n
+L=1
+domain = (0,L,0,L)
+bgmodel = simplexify(CartesianDiscreteModel(domain,partition))
+const h = L/n
 
 # Cut the background model
 cutdisc = cut(bgmodel,geom)
@@ -64,6 +45,9 @@ dΓg = Measure(Γg,degree)
 model = DiscreteModel(cutdisc)
 V = TestFESpace(model,ReferenceFE(lagrangian,Float64,order),conformity=:H1)
 U = TrialFESpace(V)
+
+uh = interpolate(u, U)
+uh_Γn = restrict(uh,trian_Γn)
 
 # Weak form Nitsche + ghost penalty (CutFEM paper Sect. 6.1)
 const γd = 10.0
@@ -96,5 +80,8 @@ uh1 = h1(uh)
 # writevtk(Ω,"results",cellfields=["uh"=>uh])
 @test el2/ul2 < 1.e-8
 @test eh1/uh1 < 1.e-7
+
+
+
 
 end # module

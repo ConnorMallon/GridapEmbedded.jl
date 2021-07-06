@@ -7,22 +7,12 @@ using Test
 using LinearAlgebra: tr
 
 # Manufactured solution
-u(x) = VectorValue(2*x[1],-2*x[2])
-∇u(x) = TensorValue(2.0,0.0,0.0,-2.0)
-Δu(x) = VectorValue(0.0,0.0)
-
+u(x) = VectorValue(x[1],-x[2])
 p(x) = x[1] - x[2]
-∇p(x) = VectorValue(1.0,-1.0)
-
-#p(x) = 0
-#∇p(x) = VectorValue(0,0)
-
-∇(::typeof(u)) = ∇u
-∇(::typeof(p)) = ∇p
 
 # Forcing data
-f(x) = - Δu(x) + ∇p(x)
-g(x) = tr(∇u(x))
+f(x) = - Δ(u)(x) + ∇(p)(x)
+g(x) = tr(∇(u)(x))
 ud(x) = u(x)
 
 # Formulation taken from
