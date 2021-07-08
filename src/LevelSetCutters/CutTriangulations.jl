@@ -14,7 +14,7 @@ end
 struct CutTriangulation{Dc,A}
   sub_trian::A
   done_ls_to_cell_to_inoutcut::Vector{Vector{Int8}}
-  pending_ls_to_point_to_value::Vector{Vector{Float64}}
+  pending_ls_to_point_to_value::AbstractVector
   minicell::MiniCell
   table::LookupTable{Dc}
 end
@@ -22,7 +22,7 @@ end
 function CutTriangulation(
   sub_trian,
   done_ls_to_cell_to_inoutcut::Vector{Vector{Int8}},
-  pending_ls_to_point_to_value::Vector{Vector{Float64}})
+  pending_ls_to_point_to_value::AbstractVector)
 
   Dc = get_cell_dim(sub_trian)
   p = Simplex(Val{Dc}())
@@ -56,7 +56,7 @@ function allocate_sub_triangulation(
   done_ls_to_cell_to_inoutcut = [ zeros(Int8,n_cells) for ls in 1:n_done_ls]
 
   n_pending_ls = length(m.pending_ls_to_point_to_value)
-  pending_ls_to_point_to_value = [zeros(Float64,n_points) for ls in 1:n_pending_ls]
+  pending_ls_to_point_to_value = [zeros(Real,n_points) for ls in 1:n_pending_ls]
 
   s = CutTriangulation(
     sub_trian,done_ls_to_cell_to_inoutcut,pending_ls_to_point_to_value)
@@ -135,7 +135,7 @@ function set_point_data!(
 end
 
 function cut_sub_triangulation(m, mpoint_to_value)
-  _m = CutTriangulation(m,Vector{Int8}[],Vector{Float64}[])
+  _m = CutTriangulation(m,Vector{Int8}[],Vector{Real}[])
   _s, cell_to_inoutcut = cut_sub_triangulation(_m,mpoint_to_value)
   s = _s.sub_trian
   s, cell_to_inoutcut
@@ -218,7 +218,7 @@ function _cut_cell!(s,scell_to_inoutcut,m,mpoint_to_value,case,mcell,scell,spoin
 end
 
 function cut_sub_triangulation_with_boundary(m, mpoint_to_value)
-  _m = CutTriangulation(m,Vector{Int8}[],Vector{Float64}[])
+  _m = CutTriangulation(m,Vector{Int8}[],Vector{Real}[])
   _s, cell_to_inoutcut, s_boundary = cut_sub_triangulation_with_boundary(_m,mpoint_to_value)
   s = _s.sub_trian
   s, cell_to_inoutcut, s_boundary
@@ -575,13 +575,20 @@ function _simplexify(
   nltcells = length(ltcell_to_lpoints)
   ntcells = ncells*nltcells
   ntpoints = ncells*nlpoints
-  T = eltype(eltype(point_to_coords))
+
+  T = eltype(first(ls_to_point_to_value))
+  T = #eltype(eltype(point_to_coords))
+  @show T
 
   tcell_to_tpoints_data = zeros(eltype(cell_to_points.data),nsp*ntcells)
   tcell_to_tpoints_ptrs = fill(eltype(cell_to_points.ptrs)(nsp),ntcells+1)
   length_to_ptrs!(tcell_to_tpoints_ptrs)
   tcell_to_tpoints = Table(tcell_to_tpoints_data,tcell_to_tpoints_ptrs)
-  tpoint_to_coords = zeros(eltype(point_to_coords),ntpoints)
+
+  #tpoint_to_coords = zeros(eltype(point_to_coords),ntpoints)
+  tpoint_to_coords = zeros(Point{Dc,T},ntpoints)
+
+
   tpoint_to_rcoords = zeros(Point{Dc,T},ntpoints)
   T = eltype(first(ls_to_point_to_value))
   ls_to_tpoint_to_value = [ zeros(T,ntpoints) for i in 1:length(ls_to_point_to_value)]
@@ -646,7 +653,7 @@ function _ensure_positive_jacobians_facets!(
 
   n_tcells = length(tcell_to_tpoints)
   tcell_to_ctype = ones(Int8,n_tcells)
-  ctype_to_reffe = [LagrangianRefFE(Float64,simplex,1)]
+  ctype_to_reffe = [LagrangianRefFE(Real,simplex,1)]
   tgrid = UnstructuredGrid(tpoint_to_coords,tcell_to_tpoints,ctype_to_reffe,tcell_to_ctype)
 
   tmap = get_cell_map(tgrid)
