@@ -218,7 +218,7 @@ function _cut_cell!(s,scell_to_inoutcut,m,mpoint_to_value,case,mcell,scell,spoin
 end
 
 function cut_sub_triangulation_with_boundary(m, mpoint_to_value)
-  _m = CutTriangulation(m,Vector{Int8}[],Vector{Real}[])
+  _m = CutTriangulation(m,Vector{Int8}[],Vector{Float64}[])
   _s, cell_to_inoutcut, s_boundary = cut_sub_triangulation_with_boundary(_m,mpoint_to_value)
   s = _s.sub_trian
   s, cell_to_inoutcut, s_boundary
@@ -577,17 +577,12 @@ function _simplexify(
   ntpoints = ncells*nlpoints
 
   T = eltype(first(ls_to_point_to_value))
-  T = #eltype(eltype(point_to_coords))
-  @show T
 
   tcell_to_tpoints_data = zeros(eltype(cell_to_points.data),nsp*ntcells)
   tcell_to_tpoints_ptrs = fill(eltype(cell_to_points.ptrs)(nsp),ntcells+1)
   length_to_ptrs!(tcell_to_tpoints_ptrs)
   tcell_to_tpoints = Table(tcell_to_tpoints_data,tcell_to_tpoints_ptrs)
-
-  #tpoint_to_coords = zeros(eltype(point_to_coords),ntpoints)
   tpoint_to_coords = zeros(Point{Dc,T},ntpoints)
-
 
   tpoint_to_rcoords = zeros(Point{Dc,T},ntpoints)
   T = eltype(first(ls_to_point_to_value))
@@ -653,7 +648,7 @@ function _ensure_positive_jacobians_facets!(
 
   n_tcells = length(tcell_to_tpoints)
   tcell_to_ctype = ones(Int8,n_tcells)
-  ctype_to_reffe = [LagrangianRefFE(Real,simplex,1)]
+  ctype_to_reffe = [LagrangianRefFE(Float64,simplex,1)]
   tgrid = UnstructuredGrid(tpoint_to_coords,tcell_to_tpoints,ctype_to_reffe,tcell_to_ctype)
 
   tmap = get_cell_map(tgrid)
